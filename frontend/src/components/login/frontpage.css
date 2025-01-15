@@ -1,0 +1,61 @@
+.frontpage-container {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+
+.panels {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.panel-button button {
+  font-size: 18px;
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.panel-button button:hover {
+  background-color: #0056b3;
+}
+
+.contact-info {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+
+.contact-item img {
+  width: 100px; 
+  height: auto;
+}
+
+.contact-item span {
+  font-size: 16px;
+  color: #333;
+}
+
+
+
+
+
+
+
+
+

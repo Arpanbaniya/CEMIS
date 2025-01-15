@@ -1,14 +1,11 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Try from './components/try';
-
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes'; //approutes import 
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Try />} />
-   
-      </Routes>
+      <AppRoutes /> 
     </Router>
   );
 }
