@@ -14,6 +14,7 @@ const registrationSchema = new mongoose.Schema({
   teams: { type: Number, default: 0 },
   teamMembers: { type: Number, default: 0 },
   substitutes: { type: Number, default: 0 },
+  paymentStatus: { type: String, enum: ["pending", "paid"], default: "pending" },
   // Ensure we store gender so the tie sheet can split into Male / Female brackets
   gender: { 
     type: String, 

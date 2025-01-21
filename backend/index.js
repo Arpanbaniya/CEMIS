@@ -12,10 +12,11 @@ const registrationRoutes = require("./routes/registrationRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const paymentRoutes = require("./routes/paymentRoutes"); // Import payment routes
 
 app.use(cors());
 app.use(bodyParser.json());
-
+app.use("/api/payments", paymentRoutes); // Register payment routes
 // Debugging middleware
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);

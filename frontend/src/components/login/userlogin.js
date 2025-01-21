@@ -27,7 +27,20 @@ const UserLogin = () => {
       if (isLogin && response.data.success) {
         // Save token in localStorage
         localStorage.setItem("token", response.data.token);
+        console.log("DEBUG: Login API Response:", response.data); // ✅ Debug the response
 
+        if (response.data.user && response.data.user._id && response.data.user.email) {
+        
+          localStorage.setItem("user", JSON.stringify({
+              _id: response.data.user._id,
+              email: response.data.user.email
+          }));
+      } else {
+          console.error("Error: userId or email is missing in login response.");
+          alert("Login failed. Please try again.");
+          return;
+      }
+      
         setMessage("Login successful! Redirecting to user dashboard...");
         setTimeout(() => {
           setIsLoading(false);

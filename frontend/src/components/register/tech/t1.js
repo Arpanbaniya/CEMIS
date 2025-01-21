@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function W() {
+function T1() {
   const [events, setEvents] = useState([]);
   const [isRegistering, setIsRegistering] = useState(null);
   const [registeredEvents, setRegisteredEvents] = useState([]);
@@ -12,12 +12,13 @@ function W() {
     program: "",
     semester: "",
     phone: "",
+    gender: "Male", 
     email: "",
   });
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Welcome Events";
+    document.title = "Individual Sports Events";
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/userlogin");
@@ -49,7 +50,7 @@ function W() {
 
   const fetchEvents = async (token) => {
     try {
-      const response = await fetch("http://localhost:5000/api/events?category=welcome", {
+      const response = await fetch("http://localhost:5000/api/events?category=Tech1", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -149,7 +150,7 @@ function W() {
 
   return (
     <div style={styles.page}>
-      <h1 style={styles.heading}>Welcome Events</h1>
+      <h1 style={styles.heading}>Individual Events</h1>
       <div style={styles.eventContainer}>
         {events.map((event) => (
           <div key={event._id} style={styles.eventBox}>
@@ -191,7 +192,29 @@ function W() {
                 </select>
                 <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
                 <input type="email" name="email" placeholder="Email" value={formData.email} readOnly />
-              
+                <label style={styles.formLabel}>Gender:</label>
+                              <div>
+                                <label>
+                                  <input
+                                    type="radio"
+                                    name="gender"
+                                    value="Male"
+                                    checked={formData.gender === "Male"}
+                                    onChange={handleInputChange}
+                                  />
+                                  Male
+                                </label>
+                                <label>
+                                  <input
+                                    type="radio"
+                                    name="gender"
+                                    value="Female"
+                                    checked={formData.gender === "Female"}
+                                    onChange={handleInputChange}
+                                  />
+                                  Female
+                                </label>
+                                </div>
                 <button type="submit" style={styles.submitButton}>
                   Submit
                 </button>
@@ -204,4 +227,4 @@ function W() {
   );
 }
 
-export default W;
+export default T1;

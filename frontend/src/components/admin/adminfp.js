@@ -6,9 +6,17 @@ function AdminFP() {
   const navigate = useNavigate();
 
   const handleNavigation = (destination) => {
-    navigate(`/events/${destination}`);
+    if (destination === 'sport') {
+      setShowSportsOptions(true);
+    }else if (destination === 'tech') {
+      setShowtechOptions(true);
+    }
+    else {
+      navigate(`/events/${destination}`);
+    }
   };
-
+  const [showSportsOptions, setShowSportsOptions] = useState(false);
+  const [showtechOptions, setShowtechOptions] = useState(false);
   return (
     <div className="App">
       <Header onNavigate={handleNavigation} />
@@ -42,7 +50,9 @@ function AdminFP() {
           </div>
         </div>
 
-        {/* Sports Week and Tech Events in one row */}
+
+
+      
         <div style={boxContainerStyles}>
           <div 
             style={{ ...boxStyles, backgroundColor: '#90ee90' }}
@@ -54,9 +64,30 @@ function AdminFP() {
               Get ready to sweat, cheer, and win.  
               It's time for some sporting excitement! ⚽🏀
             </p>
-          </div>
+          
 
-          <div 
+          {showSportsOptions && (
+          <div style={boxContainerStyles1}>
+            <div 
+              style={{ ...boxStyles2, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate('/events/sport')}
+            >
+              <h2>Team Events</h2>
+              <p style={boxDescriptionStyles}>Compete in team-based sporting events! 🏆</p>
+            </div>
+
+            <div 
+              style={{ ...boxStyles1, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate('/events/sport1')}
+            >
+              <h2>Individual Events</h2>
+              <p style={boxDescriptionStyles}>Challenge yourself in solo competitions! 🏅</p>
+            </div>
+          </div>
+        )}
+        
+</div>
+<div 
             style={{ ...boxStyles, backgroundColor: '#ffa07a' }}
             onClick={() => handleNavigation('tech')}
           >
@@ -65,12 +96,33 @@ function AdminFP() {
               Innovate, create, and inspire.  
               Dive into the latest trends and breakthroughs in tech! 🚀
             </p>
+
+            {showtechOptions && (
+          <div style={boxContainerStyles1}>
+            <div 
+              style={{ ...boxStyles2, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate('/events/tech')}
+            >
+              <h2>Team Events</h2>
+              <p style={boxDescriptionStyles}>Compete in team-based sporting events! 🏆</p>
+            </div>
+
+            <div 
+              style={{ ...boxStyles1, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate('/events/tech1')}
+            >
+              <h2>Individual Events</h2>
+              <p style={boxDescriptionStyles}>Challenge yourself in solo competitions! 🏅</p>
+            </div>
+          </div>
+        )}
           </div>
         </div>
 
-        {/* Other Events in a single row */}
-        <div 
-          style={{ ...boxStyles, backgroundColor: '#f0e68c', width: '70%' }}
+     
+        <div style={boxContainerStyles}> 
+          <div 
+          style={{ ...boxStyles, backgroundColor: '#f0e68c' }}
           onClick={() => handleNavigation('other')}
         >
           <h2>Other Events</h2>
@@ -79,6 +131,9 @@ function AdminFP() {
             Stay tuned for more engaging and surprising events. 🌟
           </p>
         </div>
+
+        
+          </div>
       </main>
       <Footer />
     </div>
@@ -229,11 +284,59 @@ const boxStyles = {
 const boxContainerStyles = {
   display: 'flex',
   justifyContent: 'center',
+  alignItems: 'center', // Aligns items in the same row
   gap: '20px',
   flexWrap: 'wrap',
   marginBottom: '30px',
 };
 
+
+const boxContainerStyles1 = {
+  display: 'flex',
+  justifyContent: 'center',  // Centers items horizontally
+  alignItems: 'center',      // Aligns them in the same row
+  gap: '40px',               // Adds space between the boxes
+  flexWrap: 'nowrap',        // Ensures they don't wrap into a new line
+  width: '100%',             // Ensures full width
+};
+
+const boxStyles1 = {
+  width: '300px',            // Set a fixed width that allows two boxes to fit in one row
+  height: 'auto',
+  backgroundColor: '#f4f4f4',
+  color: '#000',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '1.2rem',
+  fontWeight: 'bold',
+  border: '1px solid #ccc',
+  borderRadius: '10px',
+  padding: '1rem',
+  textAlign: 'center',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  cursor: 'pointer',
+};
+
+const boxStyles2 = {
+  width: '350px',            // Set a fixed width that allows two boxes to fit in one row
+  height: 'auto',
+  backgroundColor: '#f4f4f4',
+  color: '#000',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '1.2rem',
+  fontWeight: 'bold',
+  border: '1px solid #ccc',
+  borderRadius: '10px',
+  padding: '1rem',
+  textAlign: 'center',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  cursor: 'pointer',
+};
 const boxHoverStyles = {
   transform: 'scale(1.05)',
   boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',

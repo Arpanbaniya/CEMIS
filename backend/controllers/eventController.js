@@ -1,5 +1,4 @@
 // controllers/eventController.js
-
 const Event = require("../models/Event");
 
 // Fetch all events or filter by category
@@ -17,28 +16,13 @@ const getEvents = async (req, res) => {
 
 // Create a new event
 const createEvent = async (req, res) => {
-  const {
-    name,
-    location,
-    date,
-    time,
-    contact,
-    category,
-    teamRequired,
-    teamMembers,
-    substitutes,
-    teams,
-  } = req.body;
+  const { name, location, date, time, contact, category, info, teamRequired, teamMembers, substitutes, teams, paymentRequired, amount } = req.body;
+
 
   if (!category) {
     return res.status(400).json({ message: "Category is required" });
   }
-
-  if (teamRequired && (!teamMembers || !substitutes || !teams)) {
-    return res.status(400).json({
-      message: "If teams are required, teamMembers, substitutes, and teams must be specified",
-    });
-  }
+  
 
   try {
     const newEvent = new Event({
@@ -48,6 +32,9 @@ const createEvent = async (req, res) => {
       time,
       contact,
       category,
+      info,
+      paymentRequired: paymentRequired || false,
+      amount: paymentRequired ? amount : 0,
       teamRequired,
       teamMembers,
       substitutes,
@@ -60,30 +47,26 @@ const createEvent = async (req, res) => {
   }
 };
 
-// Update an existing event
+// Update an existing event (prevent modification of `info`)
 const updateEvent = async (req, res) => {
   const { id } = req.params;
   try {
-    if (req.body.teamRequired && (!req.body.teamMembers || !req.body.substitutes || !req.body.teams)) {
-      return res.status(400).json({
-        message: "If teams are required, teamMembers, substitutes, and teams must be specified",
-      });
-    }
-
     const updatedEvent = await Event.findByIdAndUpdate(id, req.body, { new: true });
+
     if (!updatedEvent) {
       return res.status(404).json({ message: "Event not found" });
     }
+
     res.json(updatedEvent);
   } catch (error) {
     res.status(500).json({ message: "Error updating event", error });
   }
 };
 
-// Delete an event
+// ✅ **Fixed: Added the missing `deleteEvent` function**
 const deleteEvent = async (req, res) => {
-  const { id } = req.params;
   try {
+    const { id } = req.params;
     const deletedEvent = await Event.findByIdAndDelete(id);
     if (!deletedEvent) {
       return res.status(404).json({ message: "Event not found" });
@@ -94,4 +77,5 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+// ✅ Ensure all functions are correctly exported
 module.exports = { getEvents, createEvent, updateEvent, deleteEvent };

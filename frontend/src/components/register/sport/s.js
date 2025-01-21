@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Sports() {
+function S() {
   const [events, setEvents] = useState([]);
   const [isRegistering, setIsRegistering] = useState(null);
   const [formData, setFormData] = useState({
@@ -266,6 +266,8 @@ function Sports() {
               <p>Location: {event.location}</p>
               <p>Date: {event.date}</p>
               <p>Time: {event.time}</p>
+              <p>Contact: {event.contact}</p>
+              <p>Info: {event.info}</p>
 
               {/* Disable the register button if user is already registered */}
               <button
@@ -435,4 +437,4 @@ function Sports() {
   );
 }
 
-export default Sports;
+export default S;

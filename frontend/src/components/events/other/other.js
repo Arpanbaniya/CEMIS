@@ -8,11 +8,14 @@ function Other() {
     date: "",
     time: "",
     contact: "",
+    info:"",
     category: "Other",
   });
   const [isCreating, setIsCreating] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
-
+  const [paymentRequired, setPaymentRequired] = useState(false);
+  const [amount, setAmount] = useState("");
+  
   const [viewingEventId, setViewingEventId] = useState(null);
   // We'll store participants as a flat array for the table
   const [participants, setParticipants] = useState([]);
@@ -37,6 +40,15 @@ function Other() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "paymentRequired") {
+      setPaymentRequired(e.target.checked);
+      if (!e.target.checked) {
+        setAmount(""); // Reset amount if payment is disabled
+      }
+    } else if (name === "amount") {
+      setAmount(value);
+    }
+    
   };
 
   const handleSubmit = async (e) => {
@@ -47,12 +59,18 @@ function Other() {
         : "http://localhost:5000/api/events";
       const method = editingEvent ? "PUT" : "POST";
 
+      const eventData = {
+        ...formData,
+        paymentRequired,
+        amount: paymentRequired ? amount : 0, // Send amount only if payment is required
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(eventData),
       });
 
       if (!response.ok) {
@@ -73,15 +91,19 @@ function Other() {
         date: "",
         time: "",
         contact: "",
+        info: "",
         category: "Other",
       });
+      setPaymentRequired(false); // Reset payment fields
+      setAmount(""); 
       setIsCreating(false);
       setEditingEvent(null);
       fetchEvents();
     } catch (error) {
       console.error("Error submitting event:", error);
     }
-  };
+};
+
 
   const handleDelete = async (id) => {
     try {
@@ -233,6 +255,7 @@ function Other() {
               date: "",
               time: "",
               contact: "",
+              info:"",
               category: "Other",
             });
           }
@@ -286,6 +309,36 @@ function Other() {
             onChange={handleInputChange}
             required
           />
+          <input
+            style={styles.input}
+            type="text"
+            name="info"
+            placeholder="Info"
+            value={formData.info}
+            onChange={handleInputChange}
+            required
+          />
+          <label>
+  <input
+    type="checkbox"
+    name="paymentRequired"
+    checked={paymentRequired}
+    onChange={handleInputChange}
+  />
+  Payment Needed?
+</label>
+
+{paymentRequired && (
+  <input
+    type="number"
+    name="amount"
+    placeholder="Enter Payment Amount"
+    value={amount}
+    onChange={handleInputChange}
+    required
+  />
+)}
+
           <button type="submit" style={styles.button}>
             {editingEvent ? "Update Event" : "Create Event"}
           </button>
@@ -301,6 +354,8 @@ function Other() {
             Location: {evt.location} <br />
             Date: {evt.date} <br />
             Contact: {evt.contact} <br />
+            Info: {evt.info} <br />
+            Payment Amt: {evt.amount+"$"}<br/>
             <button
               style={styles.button}
               onMouseEnter={(e) =>
@@ -353,6 +408,8 @@ function Other() {
                         <th style={styles.tableCell}>Semester</th>
                         <th style={styles.tableCell}>Phone</th>
                         
+
+                        
                       </tr>
                     </thead>
                     <tbody>
@@ -363,6 +420,7 @@ function Other() {
                           <td style={styles.tableCell}>{p.program}</td>
                           <td style={styles.tableCell}>{p.semester}</td>
                           <td style={styles.tableCell}>{p.phone}</td>
+                        
                        
                           
                         </tr>

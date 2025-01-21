@@ -8,6 +8,7 @@ function WC() {
     date: "",
     time: "",
     contact: "",
+    info: "",
     category: "welcome",
   });
   const [isCreating, setIsCreating] = useState(false);
@@ -64,7 +65,8 @@ function WC() {
         date: "",
         time: "",
         contact: "",
-        category: "welcome",
+        info: "",
+        category: "farewell",
       });
       setIsCreating(false);
       setEditingEvent(null);
@@ -221,6 +223,7 @@ function WC() {
               date: "",
               time: "",
               contact: "",
+              info: "",
               category: "welcome",
             });
           }
@@ -274,6 +277,15 @@ function WC() {
             onChange={handleInputChange}
             required
           />
+          <input
+            style={styles.input}
+            type="text"
+            name="info"
+            placeholder="Info"
+            value={formData.info}
+            onChange={handleInputChange}
+            required
+          />
           <button type="submit" style={styles.button}>
             {editingEvent ? "Update Event" : "Create Event"}
           </button>
@@ -289,6 +301,7 @@ function WC() {
             Location: {evt.location} <br />
             Date: {evt.date} <br />
             Contact: {evt.contact} <br />
+            Info: {evt.info} <br />
             <button
               style={styles.button}
               onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}

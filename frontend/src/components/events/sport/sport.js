@@ -9,6 +9,7 @@ function Sports() {
     date: "",
     time: "",
     contact: "",
+    info:"",
     category: "sports",
     teamRequired: false,
     teamMembers: 0,
@@ -83,6 +84,7 @@ function Sports() {
         date: "",
         time: "",
         contact: "",
+        info:"",
         category: "sports",
         teamRequired: false,
         teamMembers: 0,
@@ -270,7 +272,7 @@ function Sports() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>Sports Program Events</h1>
+      <h1 style={styles.header}>Team Programs</h1>
       <button
         style={styles.button}
         onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
@@ -285,6 +287,7 @@ function Sports() {
               date: "",
               time: "",
               contact: "",
+              info:"",
               category: "sports",
               teamRequired: false,
               teamMembers: 0,
@@ -339,6 +342,15 @@ function Sports() {
             name="contact"
             placeholder="Contact"
             value={formData.contact}
+            onChange={handleInputChange}
+            required
+          />
+           <input
+            style={styles.input}
+            type="text"
+            name="info"
+            placeholder="Info"
+            value={formData.info}
             onChange={handleInputChange}
             required
           />
@@ -420,6 +432,7 @@ function Sports() {
             Location: {evt.location} <br />
             Date: {evt.date} <br />
             Contact: {evt.contact} <br />
+            Info: {evt.info} <br />
             <button
               style={styles.button}
               onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}

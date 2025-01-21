@@ -6,6 +6,8 @@ function O() {
   const [events, setEvents] = useState([]);
   const [isRegistering, setIsRegistering] = useState(null);
   const [registeredEvents, setRegisteredEvents] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     rollNo: "",
@@ -13,11 +15,15 @@ function O() {
     semester: "",
     phone: "",
     email: "",
+    cardNumber: "",
+    expiryMonth: "",
+    expiryYear: "",
+    cvv: "",
   });
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Other Events"; // Dynamic title update
+    document.title = "Welcome Events";
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/userlogin");
@@ -29,14 +35,12 @@ function O() {
   const validateToken = async (token) => {
     try {
       const response = await fetch("http://localhost:5000/api/users/userfp", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
-        setFormData((prevData) => ({ ...prevData, email: decodedToken.email || "" })); // Pre-fill email
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        setFormData((prevData) => ({ ...prevData, email: decodedToken.email || "" }));
         fetchEvents(token);
       } else {
         localStorage.removeItem("token");
@@ -48,13 +52,19 @@ function O() {
       navigate("/userlogin");
     }
   };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+    }));
+};
+
 
   const fetchEvents = async (token) => {
     try {
       const response = await fetch("http://localhost:5000/api/events?category=Other", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
@@ -68,38 +78,92 @@ function O() {
     }
   };
 
-  const handleRegister = (eventId) => {
-    setIsRegistering(eventId);
+  const handleRegister = (event) => {
+    if (isRegistering && isRegistering._id === event._id) {
+        setIsRegistering(null); // Hide form if already open
+    } else {
+        setIsRegistering(event); // Store full event object
+    }
   };
+  
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+const handleSubmit = async (e, event) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e, eventId, eventName) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:5000/api/registrations",
-        { ...formData, eventId, eventName }, // Include eventName
+  if (isProcessing) return; // Prevent duplicate submissions
+  setIsProcessing(true);
+
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user ? user._id : null;
+  const email = user ? user.email : null;
+
+  if (!userId) {
+    alert("User ID is missing. Please log in again.");
+    setIsProcessing(false);
+    return;
+  }
+
+  try {
+    let paymentSuccess = true;
+
+    // 💳 **Process Payment First (If Required)**
+    if (event.paymentRequired) {
+      const paymentResponse = await axios.post(
+        "http://localhost:5000/api/payments/pay",
+        {
+          eventId: event._id,
+          userId,
+          email,
+          name: formData.name,
+          phone: formData.phone,
+          rollNo: formData.rollNo,
+          program: formData.program,
+          semester: formData.semester,
+          amount: event.amount || 0,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(response.data.message);
-      setRegisteredEvents((prev) => [...prev, eventId]);
-      setIsRegistering(null);
+      console.log("DEBUG: Payment Response:", paymentResponse.data);
 
-      // Remove the box after 5 seconds
-      setTimeout(() => {
-        setEvents((prevEvents) => prevEvents.filter((event) => event._id !== eventId));
-      }, 5000);
-    } catch (error) {
-      console.error("Error registering for the event:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Registration failed.");
+      if (!paymentResponse.data.success) {
+        alert("Payment failed: " + paymentResponse.data.message);
+        setIsProcessing(false);
+        return;
+      }
     }
-  };
+
+    // ✅ **Update UI immediately before sending request**
+    setRegisteredEvents((prev) => [...prev, event._id]);
+    setIsRegistering(null); 
+
+    // 📝 **Proceed with Registration After Successful Payment**
+    const registrationResponse = await axios.post(
+      "http://localhost:5000/api/registrations",
+      { ...formData, eventId: event._id, userId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log("DEBUG: Registration Response:", registrationResponse.data);
+
+    if (registrationResponse.data.success) {
+      setRegisteredEvents((prev) => [...prev, event._id]); // Ensure state updates
+      console.log("DEBUG: Registration Successful!");
+
+    } else {
+      console.error("Error:", registrationResponse.data.message);
+    
+    }
+  } catch (error) {
+    console.error("Error registering for the event:", error);
+    alert(error.response?.data?.message || "Registration failed.");
+  }
+
+  setIsProcessing(false);
+};
+
+
 
   const styles = {
     page: {
@@ -126,7 +190,6 @@ function O() {
       padding: '1rem',
       width: '300px',
       textAlign: 'center',
-      transition: 'height 0.3s ease',
     },
     registerButton: {
       padding: '10px 15px',
@@ -158,79 +221,81 @@ function O() {
       <h1 style={styles.heading}>Other Events</h1>
       <div style={styles.eventContainer}>
         {events.map((event) => (
-          <div
-            key={event._id}
-            style={{
-              ...styles.eventBox,
-              height: isRegistering === event._id ? "auto" : "250px", // Adjust height dynamically
-            }}
-          >
+          <div key={event._id} style={styles.eventBox}>
             <h3>{event.name}</h3>
-            <p>Location: {event.location}</p>
-            <p>Date: {event.date}</p>
-            <p>Time: {event.time}</p>
+            <p><strong>Location:</strong> {event.location}</p>
+            <p><strong>Date:</strong> {event.date}</p>
+            <p><strong>Time:</strong> {event.time}</p>
+            <p><strong>Contact:</strong> {event.contact}</p>
+            <p><strong>Payment Amt:</strong> {event.amount+"$"}</p>
+            
+            <p><strong>Event Information:</strong> {event.info}</p> {/* New info field */}
+
             {!registeredEvents.includes(event._id) ? (
-              <button style={styles.registerButton} onClick={() => handleRegister(event._id)}>
-                Register
-              </button>
+              <button style={styles.registerButton} onClick={() => handleRegister(event)}>
+              {isRegistering && isRegistering._id === event._id ? "Cancel" : "Register"}
+            </button>
+            
             ) : (
               <p style={{ color: "green", fontWeight: "bold" }}>Registered</p>
             )}
-            {isRegistering === event._id && (
-              <form style={styles.form} onSubmit={(e) => handleSubmit(e, event._id, event.name)}>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-                <input
-                  type="text"
-                  name="rollNo"
-                  placeholder="Roll Number"
-                  value={formData.rollNo}
-                  onChange={handleInputChange}
-                  required
-                />
-                <select name="program" value={formData.program} onChange={handleInputChange} required>
-                  <option value="">Select Program</option>
-                  <option value="BE CE">BE CE</option>
-                  <option value="BE CIVIL">BE CIVIL</option>
-                  <option value="BE SOFTWARE">BE SOFTWARE</option>
-                  <option value="BCA">BCA</option>
-                  <option value="BBA">BBA</option>
-                  <option value="IT">IT</option>
-                </select>
-                <select name="semester" value={formData.semester} onChange={handleInputChange} required>
-                  <option value="">Select Semester</option>
-                  {[...Array(8)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  readOnly
-                />
-                <button type="submit" style={styles.submitButton}>
-                  Submit
-                </button>
-              </form>
-            )}
+            
+            {isRegistering && isRegistering._id === event._id && (
+
+  <form style={styles.form} onSubmit={(e) => handleSubmit(e, event)}>
+    <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleInputChange} required />
+    <input type="text" name="rollNo" placeholder="Roll Number" value={formData.rollNo} onChange={handleInputChange} required />
+
+    <select name="program" value={formData.program} onChange={handleInputChange} required>
+      <option value="">Select Program</option>
+      <option value="BE CE">BE CE</option>
+      <option value="BE CIVIL">BE CIVIL</option>
+      <option value="BE SOFTWARE">BE SOFTWARE</option>
+      <option value="BCA">BCA</option>
+      <option value="BBA">BBA</option>
+      <option value="IT">IT</option>
+    </select>
+
+    <select name="semester" value={formData.semester} onChange={handleInputChange} required>
+      <option value="">Select Semester</option>
+      {[...Array(8)].map((_, i) => (
+        <option key={i + 1} value={i + 1}>{i + 1}</option>
+      ))}
+    </select>
+
+    <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
+    <input type="email" name="email" placeholder="Email" value={formData.email} readOnly />
+
+    {/* ✅ Payment Fields (Only if Payment is Required) */}
+    {event.paymentRequired && (
+      <>
+        <h3>Payment Details</h3>
+        <p><strong>Amount:</strong> ${event.amount}</p>
+        
+        <input
+          type="text"
+          name="cardNumber"
+          placeholder="Card Number (Only 4242 4242 4242 4242 Allowed)"
+          value={formData.cardNumber}
+          onChange={handleInputChange}
+          required
+        />
+        
+        <div style={{ display: "flex", gap: "10px" }}>
+          <input type="text" name="expiryMonth" placeholder="MM" value={formData.expiryMonth} onChange={handleInputChange} required />
+          <input type="text" name="expiryYear" placeholder="YY" value={formData.expiryYear} onChange={handleInputChange} required />
+          <input type="text" name="cvv" placeholder="CVV" value={formData.cvv} onChange={handleInputChange} required />
+        </div>
+      </>
+    )}
+
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <button type="button" onClick={() => setIsRegistering(null)} style={styles.cancelButton}>Cancel</button>
+      <button type="submit" style={styles.submitButton}>Submit</button>
+    </div>
+  </form>
+)}
+
           </div>
         ))}
       </div>
