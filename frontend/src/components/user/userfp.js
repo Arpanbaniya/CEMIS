@@ -35,20 +35,22 @@ function UserFP() {
   };
 
   const handleNavigation = (destination) => {
-    if (destination === "home") {
-      navigate("/userfp");
-    } else if (destination === "contact") {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-    } else if (destination === "about") {
-      navigate("/aboutus");
+    if (destination === "sport") {
+      setShowSportsOptions(true); // Show sports options
     } else if (destination === "viewRegistrations") {
       navigate("/view"); // Navigate to View Registrations page
     } else if (destination === "logout") {
       localStorage.removeItem("token");
       navigate("/userlogin");
+    }else if (destination === 'tech') {
+      setShowtechOptions(true);
+    } 
+    else {
+      navigate(`/events/${destination}`); // Default navigation for other events
     }
   };
-
+    const [showSportsOptions, setShowSportsOptions] = useState(false);
+  const [showtechOptions, setShowtechOptions] = useState(false);
   return (
     <div className="UserFP">
       <header style={headerStyles}>
@@ -82,24 +84,95 @@ function UserFP() {
           </div>
         </div>
 
+
+
+
+        
+        
         <div style={boxContainerStyles}>
-          <div style={{ ...boxStyles, backgroundColor: "#90ee90" }} onClick={() => navigate("/register/s")}>
-            <h2>Sport Events</h2>
-            <p style={boxDescriptionStyles}>Join thrilling sports events and show your competitive spirit.</p>
+          <div 
+            style={{ ...boxStyles, backgroundColor: '#90ee90' }}
+            onClick={() => handleNavigation('sport')}
+          >
+            <h2>Sports Week</h2>
+            <p style={boxDescriptionStyles}>
+              Game on!  
+              Get ready to sweat, cheer, and win.  
+              It's time for some sporting excitement! ⚽🏀
+            </p>
+          
+
+          {showSportsOptions && (
+          <div style={boxContainerStyles1}>
+            <div 
+              style={{ ...boxStyles2, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate("/register/s")}
+            >
+              <h2>Team Events</h2>
+              <p style={boxDescriptionStyles}>Compete in team-based sporting events! 🏆</p>
+            </div>
+
+            <div 
+              style={{ ...boxStyles1, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate("/register/s1")}
+            >
+              <h2>Individual Events</h2>
+              <p style={boxDescriptionStyles}>Challenge yourself in solo competitions! 🏅</p>
+            </div>
           </div>
-          <div style={{ ...boxStyles, backgroundColor: "#ffa07a" }} onClick={() => navigate("/register/t")}>
+        )}
+</div>
+<div 
+            style={{ ...boxStyles, backgroundColor: '#ffa07a' }}
+            onClick={() => handleNavigation('tech')}
+          >
             <h2>Tech Events</h2>
-            <p style={boxDescriptionStyles}>Innovate, explore, and stay ahead with the latest tech events.</p>
+            <p style={boxDescriptionStyles}>
+              Innovate, create, and inspire.  
+              Dive into the latest trends and breakthroughs in tech! 🚀
+            </p>
+            {showtechOptions && (
+          <div style={boxContainerStyles1}>
+            <div 
+              style={{ ...boxStyles2, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate("/register/t")}
+            >
+              <h2>Team Events</h2>
+              <p style={boxDescriptionStyles}>Compete in team-based sporting events! 🏆</p>
+            </div>
+
+            <div 
+              style={{ ...boxStyles1, backgroundColor: 'rgb(241 236 234)' }}
+              onClick={() => navigate("/register/t1")}
+            >
+              <h2>Individual Events</h2>
+              <p style={boxDescriptionStyles}>Challenge yourself in solo competitions! 🏅</p>
+            </div>
+          </div>
+        )}
           </div>
         </div>
 
-        <div style={boxContainerStyles}>
-          <div style={{ ...boxStyles, backgroundColor: "#f5deb3" }} onClick={() => navigate("/register/o")}>
-            <h2>Other Events</h2>
-            <p style={boxDescriptionStyles}>Explore other exciting events happening near you.</p>
-          </div>
+        
+        <div style={boxContainerStyles}> 
+          <div 
+          style={{ ...boxStyles, backgroundColor: '#f0e68c' }}
+          onClick={() => navigate("/register/o")}
+        >
+          <h2>Other Events</h2>
+          <p style={boxDescriptionStyles}>
+            Something unique awaits you!  
+            Stay tuned for more engaging and surprising events. 🌟
+          </p>
         </div>
+
+        
+          </div>
       </main>
+
+
+
+
 
       <footer style={footerStyles}>
     <p style={footerTextStyles}>© 2024 Events. All rights reserved.</p>
@@ -109,8 +182,7 @@ function UserFP() {
 }
 
 // Styles
-// (Keep your existing styles intact as provided in your code
-// Styles
+
 const headerStyles = {
   backgroundColor: "#333",
   color: "#fff",
@@ -144,32 +216,82 @@ const mainHeadingStyles = {
   marginBottom: "1rem",
 };
 
-const boxContainerStyles = {
-  display: "flex",
-  justifyContent: "center",
-  gap: "20px",
-  flexWrap: "wrap",
-  marginBottom: "30px",
-};
 
 const boxStyles = {
-  width: "300px",
-  height: "auto",
-  backgroundColor: "#f4f4f4",
-  color: "#000",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  fontSize: "1.2rem",
-  fontWeight: "bold",
-  border: "1px solid #ccc",
-  borderRadius: "5px",
-  margin: "10px",
-  padding: "1rem",
-  textAlign: "center",
-  transition: "transform 0.3s, box-shadow 0.3s",
-  cursor: "pointer",
+  width: '45%',
+  height: 'auto',
+  backgroundColor: '#f4f4f4',
+  color: '#000',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '1.2rem',
+  fontWeight: 'bold',
+  border: '1px solid #ccc',
+  borderRadius: '10px',
+  margin: '10px',
+  padding: '1rem',
+  textAlign: 'center',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  cursor: 'pointer',
+};
+
+const boxContainerStyles = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center', // Aligns items in the same row
+  gap: '20px',
+  flexWrap: 'wrap',
+  marginBottom: '30px',
+};
+
+
+const boxContainerStyles1 = {
+  display: 'flex',
+  justifyContent: 'center',  // Centers items horizontally
+  alignItems: 'center',      // Aligns them in the same row
+  gap: '40px',               // Adds space between the boxes
+  flexWrap: 'nowrap',        // Ensures they don't wrap into a new line
+  width: '100%',             // Ensures full width
+};
+
+const boxStyles1 = {
+  width: '350px',            // Set a fixed width that allows two boxes to fit in one row
+  height: 'auto',
+  backgroundColor: '#f4f4f4',
+  color: '#000',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '1.2rem',
+  fontWeight: 'bold',
+  border: '1px solid #ccc',
+  borderRadius: '10px',
+  padding: '1rem',
+  textAlign: 'center',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  cursor: 'pointer',
+};
+
+const boxStyles2 = {
+  width: '350px',            // Set a fixed width that allows two boxes to fit in one row
+  height: 'auto',
+  backgroundColor: '#f4f4f4',
+  color: '#000',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  fontSize: '1.2rem',
+  fontWeight: 'bold',
+  border: '1px solid #ccc',
+  borderRadius: '10px',
+  padding: '1rem',
+  textAlign: 'center',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  cursor: 'pointer',
 };
 
 const boxDescriptionStyles = {
@@ -190,36 +312,6 @@ const footerTextStyles = {
   fontSize: '1rem'
 };
 
-const footerContentStyles = {
-  display: "flex",
-  justifyContent: "space-between",
-  width: "100%",
-  padding: "1rem",
-};
 
-const contactSectionStyles = {
-  textAlign: "left",
-  padding: "0 1rem",
-};
-
-const contactHeaderStyles = {
-  fontSize: "1.5rem",
-  marginBottom: "0.5rem",
-};
-
-const contactTextStyles = {
-  fontSize: "1rem",
-};
-
-const socialSectionStyles = {
-  textAlign: "center",
-  padding: "0 1rem",
-};
-
-const largeIconStyles = {
-  width: "48px",
-  height: "48px",
-  margin: "10px auto",
-};
 
 export default UserFP;

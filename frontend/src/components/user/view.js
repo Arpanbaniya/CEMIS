@@ -49,7 +49,7 @@ function View() {
         <ul style={listStyles}>
           {registrations.map((registration) => {
             // registration.eventId is now an object with the event fields
-            const { name, location, date, time } = registration.eventId || {};
+            const { name, location, date, time, contact, info } = registration.eventId || {};
 
             return (
               <li key={registration._id} style={itemStyles}>
@@ -57,6 +57,8 @@ function View() {
                 <p><strong>Location:</strong> {location}</p>
                 <p><strong>Date:</strong> {date}</p>
                 <p><strong>Time:</strong> {time}</p>
+                <p><strong>Contact:</strong> {contact}</p>
+                <p><strong>Info:</strong> {info}</p>
               </li>
             );
           })}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-
-function Fare() {
+import { useNavigate } from "react-router-dom";
+function Sport1() {
   const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -8,14 +8,17 @@ function Fare() {
     date: "",
     time: "",
     contact: "",
-    info: "",
-    category: "farewell",
+    info:"",
+    category: "Sport1",
   });
   const [isCreating, setIsCreating] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
   const [viewingEventId, setViewingEventId] = useState(null);
+  // We'll store participants as a flat array for the table
   const [participants, setParticipants] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchEvents();
@@ -23,7 +26,9 @@ function Fare() {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/events?category=farewell");
+      const response = await fetch(
+        "http://localhost:5000/api/events?category=Sport1"
+      );
       if (!response.ok) throw new Error("Failed to fetch events");
       const data = await response.json();
       setEvents(data);
@@ -54,10 +59,16 @@ function Fare() {
       });
 
       if (!response.ok) {
-        throw new Error(editingEvent ? "Failed to modify event" : "Failed to create event");
+        throw new Error(
+          editingEvent ? "Failed to modify event" : "Failed to create event"
+        );
       }
 
-      alert(editingEvent ? "Event modified successfully!" : "Event created successfully!");
+      alert(
+        editingEvent
+          ? "Event modified successfully!"
+          : "Event created successfully!"
+      );
 
       setFormData({
         name: "",
@@ -65,8 +76,8 @@ function Fare() {
         date: "",
         time: "",
         contact: "",
-        info: "",
-        category: "farewell",
+        info:"",
+        category: "Sport1",
       });
       setIsCreating(false);
       setEditingEvent(null);
@@ -101,11 +112,14 @@ function Fare() {
     setViewingEventId(eventId);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/registrations/event/${eventId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/registrations/event/${eventId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to fetch participants");
 
@@ -126,6 +140,14 @@ function Fare() {
       console.error("Error fetching participants:", error);
       setParticipants([]);
     }
+  };
+
+  const handleGenerateTieSheet = () => {
+    if (!participants || participants.length === 0) {
+      alert("No participants to generate a tie sheet.");
+      return;
+    }
+    navigate("/events/tie", { state: { participants } });
   };
 
   const styles = {
@@ -208,7 +230,7 @@ function Fare() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>Farewell Program Events</h1>
+      <h1 style={styles.header}>Individual Program Events</h1>
       <button
         style={styles.button}
         onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
@@ -223,8 +245,8 @@ function Fare() {
               date: "",
               time: "",
               contact: "",
-              info: "",
-              category: "farewell",
+              info:"",
+              category: "Sport1",
             });
           }
         }}
@@ -304,30 +326,49 @@ function Fare() {
             Info: {evt.info} <br />
             <button
               style={styles.button}
-              onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
-              onMouseLeave={(e) => Object.assign(e.target.style, styles.button)}
+              onMouseEnter={(e) =>
+                Object.assign(e.target.style, styles.buttonHover)
+              }
+              onMouseLeave={(e) =>
+                Object.assign(e.target.style, styles.button)
+              }
               onClick={() => handleEdit(evt)}
             >
               Modify
             </button>
             <button
               style={styles.button}
-              onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
-              onMouseLeave={(e) => Object.assign(e.target.style, styles.button)}
+              onMouseEnter={(e) =>
+                Object.assign(e.target.style, styles.buttonHover)
+              }
+              onMouseLeave={(e) =>
+                Object.assign(e.target.style, styles.button)
+              }
               onClick={() => handleDelete(evt._id)}
             >
               Delete
             </button>
             <button
               style={styles.button}
-              onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
-              onMouseLeave={(e) => Object.assign(e.target.style, styles.button)}
+              onMouseEnter={(e) =>
+                Object.assign(e.target.style, styles.buttonHover)
+              }
+              onMouseLeave={(e) =>
+                Object.assign(e.target.style, styles.button)
+              }
               onClick={() => handleViewParticipants(evt._id)}
             >
               View Participants
             </button>
 
             {viewingEventId === evt._id && (
+                <div>
+                 <button
+                   style={{ ...styles.button, float: "right" }}
+                   onClick={handleGenerateTieSheet}
+                 >
+                   Generate Tie Sheet
+                 </button>
               <div style={styles.participantsContainer}>
                 <h4>Participants</h4>
                 {participants.length === 0 ? (
@@ -341,6 +382,8 @@ function Fare() {
                         <th style={styles.tableCell}>Program</th>
                         <th style={styles.tableCell}>Semester</th>
                         <th style={styles.tableCell}>Phone</th>
+                        <th style={styles.tableCell}>Gender</th>
+                        
                       </tr>
                     </thead>
                     <tbody>
@@ -351,11 +394,14 @@ function Fare() {
                           <td style={styles.tableCell}>{p.program}</td>
                           <td style={styles.tableCell}>{p.semester}</td>
                           <td style={styles.tableCell}>{p.phone}</td>
+                          <td style={styles.tableCell}>{p.gender}</td>
+                       
+                          
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                )}
+                )}</div>
               </div>
             )}
           </li>
@@ -365,4 +411,4 @@ function Fare() {
   );
 }
 
-export default Fare;
+export default Sport1;

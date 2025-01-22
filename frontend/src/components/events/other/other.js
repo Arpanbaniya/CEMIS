@@ -8,6 +8,7 @@ function Other() {
     date: "",
     time: "",
     contact: "",
+    info:"",
     category: "Other",
   });
   const [isCreating, setIsCreating] = useState(false);
@@ -73,6 +74,7 @@ function Other() {
         date: "",
         time: "",
         contact: "",
+        info:"",
         category: "Other",
       });
       setIsCreating(false);
@@ -233,6 +235,7 @@ function Other() {
               date: "",
               time: "",
               contact: "",
+              info:"",
               category: "Other",
             });
           }
@@ -286,6 +289,15 @@ function Other() {
             onChange={handleInputChange}
             required
           />
+          <input
+            style={styles.input}
+            type="text"
+            name="info"
+            placeholder="Info"
+            value={formData.info}
+            onChange={handleInputChange}
+            required
+          />
           <button type="submit" style={styles.button}>
             {editingEvent ? "Update Event" : "Create Event"}
           </button>
@@ -301,6 +313,7 @@ function Other() {
             Location: {evt.location} <br />
             Date: {evt.date} <br />
             Contact: {evt.contact} <br />
+            Info: {evt.info} <br />
             <button
               style={styles.button}
               onMouseEnter={(e) =>

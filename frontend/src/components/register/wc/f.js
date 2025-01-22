@@ -17,7 +17,7 @@ function F() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Farewell Events"; // Dynamic title update
+    document.title = "Farewell Events";
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/userlogin");
@@ -29,14 +29,12 @@ function F() {
   const validateToken = async (token) => {
     try {
       const response = await fetch("http://localhost:5000/api/users/userfp", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
-        setFormData((prevData) => ({ ...prevData, email: decodedToken.email || "" })); // Pre-fill email
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        setFormData((prevData) => ({ ...prevData, email: decodedToken.email || "" }));
         fetchEvents(token);
       } else {
         localStorage.removeItem("token");
@@ -52,9 +50,7 @@ function F() {
   const fetchEvents = async (token) => {
     try {
       const response = await fetch("http://localhost:5000/api/events?category=farewell", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
@@ -83,7 +79,7 @@ function F() {
       const token = localStorage.getItem("token");
       const response = await axios.post(
         "http://localhost:5000/api/registrations",
-        { ...formData, eventId, eventName }, // Include eventName
+        { ...formData, eventId, eventName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -91,7 +87,6 @@ function F() {
       setRegisteredEvents((prev) => [...prev, eventId]);
       setIsRegistering(null);
 
-      // Remove the box after 5 seconds
       setTimeout(() => {
         setEvents((prevEvents) => prevEvents.filter((event) => event._id !== eventId));
       }, 5000);
@@ -126,7 +121,6 @@ function F() {
       padding: '1rem',
       width: '300px',
       textAlign: 'center',
-      transition: 'height 0.3s ease',
     },
     registerButton: {
       padding: '10px 15px',
@@ -158,17 +152,14 @@ function F() {
       <h1 style={styles.heading}>Farewell Events</h1>
       <div style={styles.eventContainer}>
         {events.map((event) => (
-          <div
-            key={event._id}
-            style={{
-              ...styles.eventBox,
-              height: isRegistering === event._id ? "auto" : "250px", // Adjust height dynamically
-            }}
-          >
+          <div key={event._id} style={styles.eventBox}>
             <h3>{event.name}</h3>
-            <p>Location: {event.location}</p>
-            <p>Date: {event.date}</p>
-            <p>Time: {event.time}</p>
+            <p><strong>Location:</strong> {event.location}</p>
+            <p><strong>Date:</strong> {event.date}</p>
+            <p><strong>Time:</strong> {event.time}</p>
+            <p><strong>Contact:</strong> {event.contact}</p>
+            <p><strong>Event Information:</strong> {event.info}</p> {/* New info field */}
+
             {!registeredEvents.includes(event._id) ? (
               <button style={styles.registerButton} onClick={() => handleRegister(event._id)}>
                 Register
@@ -176,24 +167,11 @@ function F() {
             ) : (
               <p style={{ color: "green", fontWeight: "bold" }}>Registered</p>
             )}
+            
             {isRegistering === event._id && (
               <form style={styles.form} onSubmit={(e) => handleSubmit(e, event._id, event.name)}>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-                <input
-                  type="text"
-                  name="rollNo"
-                  placeholder="Roll Number"
-                  value={formData.rollNo}
-                  onChange={handleInputChange}
-                  required
-                />
+                <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleInputChange} required />
+                <input type="text" name="rollNo" placeholder="Roll Number" value={formData.rollNo} onChange={handleInputChange} required />
                 <select name="program" value={formData.program} onChange={handleInputChange} required>
                   <option value="">Select Program</option>
                   <option value="BE CE">BE CE</option>
@@ -211,21 +189,9 @@ function F() {
                     </option>
                   ))}
                 </select>
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="Phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  readOnly
-                />
+                <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleInputChange} required />
+                <input type="email" name="email" placeholder="Email" value={formData.email} readOnly />
+              
                 <button type="submit" style={styles.submitButton}>
                   Submit
                 </button>
